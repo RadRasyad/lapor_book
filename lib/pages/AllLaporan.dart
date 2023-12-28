@@ -41,8 +41,6 @@ class _AllLaporanState extends State<AllLaporan> {
             }),
       ),
     );
-
-
   }
 
   void getTransaksi() async {
@@ -85,7 +83,5 @@ class _AllLaporanState extends State<AllLaporan> {
       print(e);
     }
   }
-
-
 
 }

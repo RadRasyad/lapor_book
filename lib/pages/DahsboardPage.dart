@@ -39,23 +39,31 @@ class _DashboardFull extends State<DashboardFull> {
     role: '',
   );
 
-  @override
-  void initState() {
-    super.initState();
-    getAkun();
-    pages = <Widget>[
-      AllLaporan(akun: akun),
-      MyLaporan(akun: akun),
-      Profile(akun: akun),
-    ];
-  }
-
   void getAkun() async {
     setState(() {
       _isLoading = true;
     });
     try {
+        QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
+            .collection('akun')
+            .where('uid', isEqualTo: _auth.currentUser!.uid)
+            .limit(1)
+            .get();
 
+        if (querySnapshot.docs.isNotEmpty) {
+          var userData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+
+          setState(() {
+            akun = Akun(
+              uid: userData['uid'],
+              nama: userData['nama'],
+              noHP: userData['noHP'],
+              email: userData['email'],
+              docId: userData['docId'],
+              role: userData['role'],
+            );
+          });
+        }
     } catch(e) {
       final snackbar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
@@ -74,13 +82,27 @@ class _DashboardFull extends State<DashboardFull> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    getAkun();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    pages = <Widget>[
+      AllLaporan(akun: akun),
+      MyLaporan(akun: akun),
+      Profile(akun: akun),
+    ];
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryColor,
         child: const Icon(Icons.add, size: 35),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/add', arguments: {
+            'akun': akun,
+          });
+        },
       ),
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -90,9 +112,7 @@ class _DashboardFull extends State<DashboardFull> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: primaryColor,
         currentIndex: _selectedIndex,
-        onTap: (index){
-          _onItemTapped(index);
-        },
+        onTap: _onItemTapped,
         selectedItemColor: Colors.white,
         selectedFontSize: 16,
         unselectedItemColor: Colors.grey[800],
@@ -115,7 +135,7 @@ class _DashboardFull extends State<DashboardFull> {
           ? const Center(
         child: CircularProgressIndicator(),
       )
-          : pages[_selectedIndex],
+          : pages.elementAt(_selectedIndex),
     );
   }
 }
