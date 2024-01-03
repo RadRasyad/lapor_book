@@ -21,8 +21,8 @@ void main() async {
       '/login': (context) => const LoginPage(),
       '/register': (context) => const RegisterPage(),
       '/dashboard': (context) => const DashboardPage(),
-      '/add': (context) => AddFormPage(),
-      '/detail': (context) => DetailPage(),
+      '/add': (context) => const AddFormPage(),
+      '/detail': (context) => const DetailPage(),
     },
   ));
 }

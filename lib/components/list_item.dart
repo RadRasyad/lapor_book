@@ -28,7 +28,6 @@ class _ListItemState extends State<ListItem> {
     try {
       await _firestore.collection('laporan').doc(widget.laporan.docId).delete();
 
-      // menghapus gambar dari storage
       if (widget.laporan.gambar != '') {
         await _storage.refFromURL(widget.laporan.gambar!).delete();
       }
@@ -52,43 +51,45 @@ class _ListItemState extends State<ListItem> {
          });
         },
         onLongPress: () {
-          if (widget.isLaporanku) {
-            showDialog(
-                context: context,
-                builder: (BuildContext) {
-                  return AlertDialog(
-                    title: Text('Delete ${widget.laporan.judul}?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          deleteLaporan();
-                        },
-                        child: Text('Hapus'),
-                      ),
-                    ],
-                  );
-                });
-          }
-        },
-        child: Column(
+            if (widget.isLaporanku) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext) {
+                    return AlertDialog(
+                      title: Text('Delete ${widget.laporan.judul}?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Batal'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            deleteLaporan();
+                            Navigator.pop(context);
+                          },
+                          child: Text('Hapus'),
+                        ),
+                      ],
+                    );
+                  });
+            }
+          },
+          child: Column(
             children: [
               widget.laporan.gambar != ''
                   ? Image.network(
-                widget.laporan.gambar!,
-                width: 130,
-                height: 130,
-              )
+                      widget.laporan.gambar!,
+                      width: 130,
+                      height: 130,
+                      fit: BoxFit.cover,
+                    )
                   : Image.asset(
-                'assets/istock-default.jpg',
-                width: 130,
-                height: 130,
-              ),
+                      'images/placeholder.png',
+                      width: 130,
+                      height: 130,
+                    ),
               Container(
                 width: double.infinity,
                 alignment: Alignment.center,
@@ -121,7 +122,6 @@ class _ListItemState extends State<ListItem> {
                   ),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                           color: primaryColor,
                           borderRadius: const BorderRadius.only(
@@ -129,6 +129,7 @@ class _ListItemState extends State<ListItem> {
                           border: const Border.symmetric(
                               vertical: BorderSide(width: 1))),
                       alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         DateFormat('dd/MM/yyyy').format(widget.laporan.tanggal),
                         style: headerStyle(level: 5, dark: false),
@@ -139,7 +140,6 @@ class _ListItemState extends State<ListItem> {
               )
             ],
           ),
-      )
-    );
+        ));
   }
 }

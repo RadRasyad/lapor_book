@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/styles.dart';
 
@@ -21,10 +22,7 @@ class _SplashPage extends State<SplashFull> {
   @override
   void initState() {
     super.initState();
-    // TODO nanti bagian ini diganti cek koneksi ke firebase dan cek login
-    Future.delayed(Duration.zero, () {
-      Navigator.pushReplacementNamed(context, '/register');
-    });
+    checkUserAuthentication();
   }
 
   @override
@@ -38,4 +36,21 @@ class _SplashPage extends State<SplashFull> {
         ));
   }
 
+  void checkUserAuthentication() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user!=null) {
+        Future.delayed(Duration.zero, () {
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        });
+      } else {
+        Future.delayed(Duration.zero, () {
+          Navigator.pushReplacementNamed(context, '/login');
+        });
+      }
+    } catch (e) {
+      print("Error during authentication check: $e");
+    }
+  }
 }
