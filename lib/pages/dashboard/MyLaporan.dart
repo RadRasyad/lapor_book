@@ -59,11 +59,21 @@ class _MyLaporanState extends State<MyLaporan> {
         listLaporan.clear();
         for (var documents in querySnapshot.docs) {
           List<dynamic>? komentarData = documents.data()['komentar'];
-
           List<Komentar>? listKomentar = komentarData?.map((map) {
             return Komentar(
               nama: map['nama'],
               isi: map['isi'],
+            );
+          }).toList();
+
+          List<dynamic>? likeData = documents.data()['like'];
+          List<Like>? listLike = likeData?.map((map) {
+            return Like(
+              docId: map['docId'],
+              uid: map['uid'],
+              nama: map['nama'],
+              tanggal: map['tanggal'].toDate(),
+
             );
           }).toList();
 
@@ -80,6 +90,7 @@ class _MyLaporanState extends State<MyLaporan> {
               tanggal: documents['tanggal'].toDate(),
               maps: documents.data()['maps'],
               komentar: listKomentar,
+              like: listLike
             ),
           );
         }

@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lapor_book/components/styles.dart';
 import 'package:lapor_book/models/akun.dart';
-import 'package:lapor_book/pages/AllLaporan.dart';
-import 'package:lapor_book/pages/MyLaporan.dart';
-import 'package:lapor_book/pages/ProfilePage.dart';
+import 'package:lapor_book/pages/dashboard/AllLaporan.dart';
+import 'package:lapor_book/pages/dashboard/MyLaporan.dart';
+import 'package:lapor_book/pages/dashboard/ProfilePage.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});

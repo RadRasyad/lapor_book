@@ -1,4 +1,6 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lapor_book/components/status_dialog.dart';
@@ -14,9 +16,13 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
   bool _isLoading = false;
+  List<Like> listLike = [];
 
   String? status;
+  bool isLiked = false;
 
   Future launch(String uri) async {
     if (uri == '') return;
@@ -36,6 +42,81 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  void addTransaksiLike(Akun akun, String docId) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      CollectionReference likeCollection = _firestore
+          .collection('laporan')
+          .doc(docId)
+          .collection('like');
+
+      // Convert DateTime to Firestore Timestamp
+      Timestamp timestamp = Timestamp.fromDate(DateTime.now());
+      final likeId = likeCollection.doc().id;
+
+      await likeCollection.doc(likeId).set({
+        'uid': _auth.currentUser!.uid,
+        'docId': docId,
+        'nama': akun.nama,
+        'tanggal': timestamp,
+      }).catchError((e) {
+        throw e;
+      });
+      Navigator.popAndPushNamed(context, '/dashboard');
+    } catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  
+  void checkLikeStatus(Akun akun, String docId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      await _firestore
+          .collection('laporan')
+          .doc(docId)
+          .collection('like')
+          .where('uid', isEqualTo: akun.uid)
+          .get();
+
+      setState(() {
+        listLike.clear();
+        for (var documents in querySnapshot.docs) {
+          if (documents!=null) {
+            listLike.add(
+              Like(
+                docId: documents.data()['docId'],
+                uid: documents.data()['uid'],
+                nama: documents.data()['nama'],
+                tanggal: documents['tanggal'].toDate(),
+              ),
+            );
+          }
+        }
+        print('List Like Detail: ${listLike.length}');
+        if (listLike.isEmpty) {
+          setState(() {
+            isLiked = false;
+          });
+        } else {
+          setState(() {
+            isLiked = true;
+          });
+        }
+      });
+      
+    }  catch (e) {
+      final snackbar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final arguments =
@@ -43,6 +124,8 @@ class _DetailPageState extends State<DetailPage> {
 
     Laporan laporan = arguments['laporan'];
     Akun akun = arguments['akun'];
+
+    checkLikeStatus(akun, laporan.docId);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,6 +170,41 @@ class _DetailPageState extends State<DetailPage> {
                     textStatus(
                         laporan.instansi, Colors.white, Colors.black),
                   ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    textStatus(
+                            (listLike.length ?? 0).toString(),
+                            Colors.white,
+                            Colors.black,
+                          ),
+                    IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          if (!isLiked) {
+                            addTransaksiLike(akun, laporan.docId);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text("Sudah Pernah Like"),
+                                duration: const Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                            );
+                          }
+                        });
+                      },
+                    ),
+                        ],
                 ),
                 const SizedBox(height: 20),
                 ListTile(
@@ -164,4 +282,5 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
+
 }
