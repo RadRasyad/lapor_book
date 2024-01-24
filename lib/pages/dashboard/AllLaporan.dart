@@ -61,6 +61,8 @@ class _AllLaporanState extends State<AllLaporan> {
             );
           }).toList();
 
+          print("Nama: ${listKomentar?[0].nama}, Isi: ${listKomentar?[0].isi}");
+
           List<dynamic>? likeData = documents.data()['like'];
 
           List<Like>? listLike = likeData?.map((map) {

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:lapor_book/components/list_comment.dart';
 import 'package:lapor_book/components/status_dialog.dart';
 import 'package:lapor_book/components/styles.dart';
 import 'package:lapor_book/models/akun.dart';
@@ -99,7 +100,6 @@ class _DetailPageState extends State<DetailPage> {
             );
           }
         }
-        print('List Like Detail: ${listLike.length}');
         if (listLike.isEmpty) {
           setState(() {
             isLiked = false;
@@ -138,8 +138,7 @@ class _DetailPageState extends State<DetailPage> {
         child: _isLoading
             ? const Center(
           child: CircularProgressIndicator(),
-        )
-            : SingleChildScrollView(
+        ) : SingleChildScrollView(
           child: Container(
             margin:
             const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
@@ -260,6 +259,40 @@ class _DetailPageState extends State<DetailPage> {
                       child: Text('Ubah Status'),
                     ),
                   ),
+                const SizedBox(height: 20),
+                Container(
+                    width: double.infinity,
+                  child: FilledButton(
+                    style: buttonStyle,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/add_comment', arguments: {
+                        'laporan': laporan,
+                        'akun': akun,
+                      });
+                    },
+                    child: Text('Tambah Komentar'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      'Deskripsi Laporan',
+                      style: headerStyle(level: 3),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(laporan.deskripsi ?? ''),
+                    ),
+                    const SizedBox(height: 20),
+                    // Menampilkan list komentar dengan menggunakan ListComment
+                    ListComment(komentarList: laporan.komentar),
+                  ],
+                ),
               ],
             ),
           ),

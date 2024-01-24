@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lapor_book/firebase_options.dart';
 import 'package:lapor_book/pages/AddFormPage.dart';
 import 'package:lapor_book/pages/dashboard/DahsboardPage.dart';
+import 'package:lapor_book/pages/detail/AddCommentPage.dart';
 import 'package:lapor_book/pages/detail/DetailPage.dart';
 import 'package:lapor_book/pages/LoginPage.dart';
 import 'package:lapor_book/pages/RegisterPage.dart';
@@ -23,6 +24,7 @@ void main() async {
       '/dashboard': (context) => const DashboardPage(),
       '/add': (context) => const AddFormPage(),
       '/detail': (context) => const DetailPage(),
+      '/add_comment': (context) => const AddCommentPage(),
     },
   ));
 }
